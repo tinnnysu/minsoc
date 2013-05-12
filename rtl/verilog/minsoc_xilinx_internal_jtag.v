@@ -462,14 +462,13 @@ end
 assign update_dr_o = update_out;
 
 
-`endif
-`endif
-`endif
-`endif
-`endif
-`endif
+`endif //  `ifdef VIRTEX5
+`endif // !`ifdef VIRTEX4
+`endif // !`ifdef VIRTEX2
+`endif // !`ifdef VIRTEX
+`endif // !`ifdef SPARTAN6
+`endif // !`ifdef SPARTAN3A
 `endif // !`ifdef SPARTAN3
-`endif // !`ifdef SPARTAN2
-`endif
+`endif // !`ifdef SPARTAN2 
 
 endmodule
