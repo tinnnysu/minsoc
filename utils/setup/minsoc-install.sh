@@ -5,7 +5,7 @@
 
 # ===== CONFIGURATIONS =====
 # ==========================
-MINSOC_SVN_URL=http://opencores.org/ocsvn/minsoc/minsoc/tags/release-1.0
+MINSOC_GIT_URL=https://github.com/tinnnysu/minsoc.git
 export SCRIPT_DIR="$( cd -P "$( dirname "$0" )" && pwd )"
 export DIR_TO_INSTALL=`pwd`
 
@@ -106,7 +106,7 @@ execcmd "Creating directory ./tools for package binaries" "mkdir -p tools"
 cecho "\nDownloading packages"
 cd ${DIR_TO_INSTALL}
 cecho "Download MinSoC"
-svn co -q ${MINSOC_SVN_URL} minsoc	#user need to input password, execcmd omits command output and should be this way
+git clone --recursive ${MINSOC_GIT_URL} -b base-1.0 minsoc
 execcmd "cd ${DIR_TO_INSTALL}/download"
 if [ "$ENV" == "Cygwin" ]
 then
