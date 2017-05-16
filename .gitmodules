@@ -4,3 +4,6 @@
 [submodule "rtl/verilog/or1200"]
 	path = rtl/verilog/or1200
 	url = https://github.com/tinnnysu/or1200.git
+[submodule "rtl/verilog/uart16550"]
+	path = rtl/verilog/uart16550
+	url = https://github.com/tinnnysu/uart16550.git
