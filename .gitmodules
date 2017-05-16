@@ -7,3 +7,6 @@
 [submodule "rtl/verilog/uart16550"]
 	path = rtl/verilog/uart16550
 	url = https://github.com/tinnnysu/uart16550.git
+[submodule "rtl/verilog/ethmac"]
+	path = rtl/verilog/ethmac
+	url = https://github.com/tinnnysu/ethmac.git
