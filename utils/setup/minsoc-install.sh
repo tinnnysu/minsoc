@@ -110,25 +110,25 @@ svn co -q ${MINSOC_SVN_URL} minsoc	#user need to input password, execcmd omits c
 execcmd "cd ${DIR_TO_INSTALL}/download"
 if [ "$ENV" == "Cygwin" ]
 then
-    execcmd "Downloading GNU Toolchain" "wget ftp://ocuser:ocuser@openrisc.opencores.org/toolchain/or32-elf-cygwin-1.7.tar.bz2";
+    execcmd "Downloading GNU Toolchain" "wget http://minsoc.com/dep/trunk/or32-elf-cygwin-1.7.tar.bz2";
 else
     if [ $KERNEL_ARCH == "32" ];
     then
-        execcmd "Downloading GNU Toolchain" "wget ftp://ocuser:ocuser@openrisc.opencores.org/toolchain/or32-elf-linux-x86.tar.bz2";
+        execcmd "Downloading GNU Toolchain" "wget http://minsoc.com/dep/trunk/or32-elf-linux-x86.tar.bz2";
     elif [ $KERNEL_ARCH == "64" ];
     then
-        execcmd "Downloading GNU Toolchain" "wget ftp://ocuser:ocuser@openrisc.opencores.org/toolchain/or32-elf-linux-x86_64.tar.bz2";
+        execcmd "Downloading GNU Toolchain" "wget http://minsoc.com/dep/trunk/or32-elf-linux-x86_64.tar.bz2";
     fi
 fi
-execcmd "Downloading GDB" "wget ftp://anonymous:anonymous@ftp.gnu.org/gnu/gdb/gdb-6.8a.tar.bz2"
-execcmd "wget ftp://ocuser:ocuser@openrisc.opencores.org/toolchain/or32-gdb-6.8-patch-2.4.bz2"
-execcmd "svn export -q http://opencores.org/ocsvn/adv_debug_sys/adv_debug_sys/trunk/Patches/GDB6.8/gdb-6.8-bz436037-reg-no-longer-active.patch"
+execcmd "Downloading GDB" "wget http://minsoc.com/dep/trunk/gdb-6.8a.tar.bz2"
+execcmd "wget http://minsoc.com/dep/trunk/or32-gdb-6.8-patch-2.4.bz2"
+execcmd "wget http://minsoc.com/dep/trunk/gdb-6.8-bz436037-reg-no-longer-active.patch"
 if [ "$ENV" != "Cygwin" ]
 then
     execcmd "Downloading libusb-0.1 for Advanced Debug System" "wget http://sourceforge.net/projects/libusb/files/libusb-0.1%20%28LEGACY%29/0.1.12/libusb-0.1.12.tar.gz"
 fi
-execcmd "Downloading libftdi for Advanced Debug System" "wget http://www.intra2net.com/en/developer/libftdi/download/libftdi-0.19.tar.gz"
-execcmd "Downloading Icarus Verilog" "wget ftp://icarus.com/pub/eda/verilog/v0.9/verilog-0.9.4.tar.gz"
+execcmd "Downloading libftdi for Advanced Debug System" "wget http://minsoc.com/dep/trunk/libftdi-0.19.tar.gz"
+execcmd "Downloading Icarus Verilog" "wget http://minsoc.com/dep/trunk/verilog-0.9.4.tar.gz"
 
 
 #Uncompressing everything
