@@ -117,7 +117,7 @@ execcmd "Creating directory ./tools for package binaries" "mkdir -p tools"
 cecho "\nDownloading packages"
 cd ${DIR_TO_INSTALL}
 cecho "Download MinSoC"
-git clone --recursive ${MINSOC_GIT_URL} -b base-1.0 minsoc
+git clone --recursive ${MINSOC_GIT_URL} -b dev minsoc
 execcmd "cd ${DIR_TO_INSTALL}/download"
 if [ "$ENV" == "Cygwin" ]
 then
