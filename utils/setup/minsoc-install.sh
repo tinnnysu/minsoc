@@ -25,6 +25,17 @@ function testtool
     fi
 }
 
+function testlib
+{
+    is_missing=`ldconfig -p | grep "$1.so"`
+    echo $is_missing
+    if [ -z "$is_missing" ]
+    then
+        errormsg "$1 is not installed, install it and re-run this installation script."
+    else
+        cecho "$1 is installed, pass"
+    fi
+}
 
 #Setting environment
 ENV=`uname -o`
@@ -61,10 +72,10 @@ testtool patch
 testtool gcc
 testtool make
 testtool makeinfo
-testtool libncurses
+testlib libncurses
 testtool flex
 testtool bison
-testtool libz
+testlib libz
 if [ "$ENV" == "Cygwin" ]
 then
     testtool ioperm
