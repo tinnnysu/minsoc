@@ -27,6 +27,13 @@ module minsoc_top (
 	eth_rx_dv, eth_rx_er, eth_rxd, eth_fds_mdint,
 	eth_mdc, eth_mdio
 `endif
+
+`ifdef SDRAM
+	, sdram_clk, sdram_cke, sdram_cs,
+	sdram_ras, sdram_cas, sdram_we,
+	sdram_dqm, sdram_addr, sdram_ba,
+	sdram_data
+`endif
 );
 
 //
@@ -72,6 +79,23 @@ output			eth_trste;
 input			eth_fds_mdint;
 inout			eth_mdio;
 output			eth_mdc;
+`endif
+
+//
+// SDRAM
+//
+
+`ifdef SDRAM
+output          sdram_clk;
+output          sdram_cke;
+output          sdram_cs;
+output          sdram_ras;
+output          sdram_cas;
+output          sdram_we;
+output [1:0]    sdram_dqm;
+output [12:0]   sdram_addr;
+output [1:0]    sdram_ba;
+inout [15:0]    sdram_data;
 `endif
 
 //
@@ -212,6 +236,19 @@ wire			wb_ss_cyc_i;
 wire			wb_ss_stb_i;
 wire			wb_ss_ack_o;
 wire			wb_ss_err_o;
+
+//
+// SDRAM controller slave i/f wires
+//
+wire 	[31:0]		wb_sds_dat_i;
+wire 	[31:0]		wb_sds_dat_o;
+wire 	[31:0]		wb_sds_adr_i;
+wire 	[3:0]		wb_sds_sel_i;
+wire			wb_sds_we_i;
+wire			wb_sds_cyc_i;
+wire			wb_sds_stb_i;
+wire			wb_sds_ack_o;
+wire			wb_sds_err_o;
 
 //
 // Ethernet core master i/f wires
@@ -642,9 +679,6 @@ assign wb_sp_ack_o = 1'b0;
 //
 `ifdef MEMORY_MODEL
 minsoc_memory_model # 
-`else
-minsoc_onchip_ram_top # 
-`endif
 (
     .adr_width(`MEMORY_ADR_WIDTH)     //16 blocks of 2048 bytes memory 32768
 )
@@ -665,6 +699,65 @@ onchip_ram_top (
 	.wb_ack_o	( wb_ss_ack_o ),
 	.wb_err_o	( wb_ss_err_o )
 );
+`else
+`ifdef SDRAM
+sdram #
+(
+    .SDRAM_START_DELAY(1000)
+)
+external_sdram
+(
+    .clk_i	(wb_clk),
+    .rst_i	(wb_rst),
+
+    // Wishbone Interface
+    .stb_i	(wb_sds_stb_i),
+    .we_i	(wb_sds_we_i),
+    .sel_i	(wb_sds_sel_i),
+    .cyc_i	(wb_sds_cyc_i),
+    .addr_i	(wb_sds_addr_i),
+    .data_i	(wb_sds_dat_i),
+    .data_o	(wb_sds_dat_o),
+    .stall_o	(wb_sds_err_o),
+    .ack_o	(wb_sds_ack_o),
+
+    // SDRAM Interface
+    .sdram_clk_o       (sdram_clk),
+    .sdram_cke_o       (sdram_cke),
+    .sdram_cs_o        (sdram_cs),
+    .sdram_ras_o       (sdram_ras),
+    .sdram_cas_o       (sdram_cas),
+    .sdram_we_o        (sdram_we),
+    .sdram_dqm_o       (sdram_dqm),
+    .sdram_addr_o      (sdram_addr),
+    .sdram_ba_o        (sdram_ba),
+    .sdram_data_io     (sdram_data)
+
+);
+`else
+minsoc_onchip_ram_top # 
+(
+    .adr_width(`MEMORY_ADR_WIDTH)     //16 blocks of 2048 bytes memory 32768
+)
+onchip_ram_top (
+
+	// WISHBONE common
+	.wb_clk_i	( wb_clk ),
+	.wb_rst_i	( wb_rst ),
+
+	// WISHBONE slave
+	.wb_dat_i	( wb_ss_dat_i ),
+	.wb_dat_o	( wb_ss_dat_o ),
+	.wb_adr_i	( wb_ss_adr_i ),
+	.wb_sel_i	( wb_ss_sel_i ),
+	.wb_we_i	( wb_ss_we_i  ),
+	.wb_cyc_i	( wb_ss_cyc_i ),
+	.wb_stb_i	( wb_ss_stb_i ),
+	.wb_ack_o	( wb_ss_ack_o ),
+	.wb_err_o	( wb_ss_err_o )
+);
+`endif
+`endif
 
 //
 // Instantiation of the UART16550
@@ -891,6 +984,17 @@ minsoc_tc_top #(`APP_ADDR_DEC_W,
 	.i7_wb_err_o	( ),
 
 	// WISHBONE Target 0
+`ifdef SDRAM
+	.t0_wb_cyc_o	( wb_sds_cyc_i ),
+	.t0_wb_stb_o	( wb_sds_stb_i ),
+	.t0_wb_adr_o	( wb_sds_adr_i ),
+	.t0_wb_sel_o	( wb_sds_sel_i ),
+	.t0_wb_we_o	( wb_sds_we_i  ),
+	.t0_wb_dat_o	( wb_sds_dat_i ),
+	.t0_wb_dat_i	( wb_sds_dat_o ),
+	.t0_wb_ack_i	( wb_sds_ack_o ),
+	.t0_wb_err_i	( wb_sds_err_o ),
+`else
 	.t0_wb_cyc_o	( wb_ss_cyc_i ),
 	.t0_wb_stb_o	( wb_ss_stb_i ),
 	.t0_wb_adr_o	( wb_ss_adr_i ),
@@ -900,6 +1004,7 @@ minsoc_tc_top #(`APP_ADDR_DEC_W,
 	.t0_wb_dat_i	( wb_ss_dat_o ),
 	.t0_wb_ack_i	( wb_ss_ack_o ),
 	.t0_wb_err_i	( wb_ss_err_o ),
+`endif
 
 	// WISHBONE Target 1
 	.t1_wb_cyc_o	( wb_fs_cyc_i ),

@@ -99,6 +99,7 @@
 //
 `define UART
 //`define ETHERNET
+`define SDRAM
 
 //
 // Ethernet reset
@@ -140,7 +141,7 @@
     `undef FPGA_TAP
     `undef FPGA_CLOCK_DIVISION
     `undef ALTERA_FPGA
-    `undef CYCLONE_III
+    `undef CYCLONE_II
 
 	`define GENERIC_TAP
 	`define GENERIC_MEMORY
