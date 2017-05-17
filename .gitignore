@@ -1,0 +1,11 @@
+prj/altera/*
+prj/sim/*
+prj/xilinx/*
+
+sw/*/*.o
+sw/*/*.bin
+sw/*/*.a
+sw/*/*.or32
+sw/*/*.hex
+
+syn/buildSupport/*
