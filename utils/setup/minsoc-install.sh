@@ -28,7 +28,6 @@ function testtool
 function testlib
 {
     is_missing=`ldconfig -p | grep "$1.so"`
-    echo $is_missing
     if [ -z "$is_missing" ]
     then
         errormsg "$1 is not installed, install it and re-run this installation script."
