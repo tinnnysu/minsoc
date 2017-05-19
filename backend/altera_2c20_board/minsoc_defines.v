@@ -99,7 +99,8 @@
 //
 `define UART
 //`define ETHERNET
-`define SDRAM
+//`define SDRAM
+`define SRAM
 
 //
 // Ethernet reset

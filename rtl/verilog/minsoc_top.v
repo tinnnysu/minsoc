@@ -34,6 +34,12 @@ module minsoc_top (
 	sdram_dqm, sdram_addr, sdram_ba,
 	sdram_data
 `endif
+
+`ifdef SRAM
+	, sram_dq, sram_addr, sram_lb_n,
+	sram_ub_n, sram_ce_n, sram_oe_n,
+	sram_we_n
+`endif
 );
 
 //
@@ -96,6 +102,20 @@ output [1:0]    sdram_dqm;
 output [12:0]   sdram_addr;
 output [1:0]    sdram_ba;
 inout [15:0]    sdram_data;
+`endif
+
+//
+// SRAM
+//
+
+`ifdef SRAM
+inout  [15:0]   sram_dq;    // SRAM Data bus 16 Bits
+output [17:0] sram_addr;    // SRAM Address bus 18 Bits
+output        sram_lb_n;    // SRAM Low-byte Data Mask
+output        sram_ub_n;    // SRAM High-byte Data Mask
+output        sram_ce_n;    // SRAM Chip chipselect
+output        sram_oe_n;    // SRAM Output chipselect
+output        sram_we_n;    // SRAM Write chipselect
 `endif
 
 //
@@ -249,6 +269,17 @@ wire			wb_sds_cyc_i;
 wire			wb_sds_stb_i;
 wire			wb_sds_ack_o;
 wire			wb_sds_err_o;
+
+// External SRAM slave i/f wires
+wire 	[31:0]		wb_ess_dat_i;
+wire 	[31:0]		wb_ess_dat_o;
+wire 	[31:0]		wb_ess_adr_i;
+wire 	[3:0]		wb_ess_sel_i;
+wire			wb_ess_we_i;
+wire			wb_ess_cyc_i;
+wire			wb_ess_stb_i;
+wire			wb_ess_ack_o;
+wire			wb_ess_err_o;
 
 //
 // Ethernet core master i/f wires
@@ -735,6 +766,31 @@ external_sdram
 
 );
 `else
+`ifdef SRAM
+sram_wrapper external_sram
+(
+    .wb_clk_i		(wb_clk),
+    .wb_rst_i		(wb_rst),
+
+    .wb_dat_i		(wb_ess_dat_i),
+    .wb_dat_o		(wb_ess_dat_o),
+    .wb_adr_i		(wb_ess_addr_i),
+    .wb_sel_i		(wb_ess_sel_i),
+    .wb_we_i		(wb_ess_we_i),
+    .wb_cyc_i		(wb_ess_cyc_i),
+    .wb_stb_i		(wb_ess_stb_i),
+    .wb_ack_o		(wb_ess_ack_i),
+    .wb_err_o		(wb_ess_err_i),
+
+    .SRAM_DQ		(sram_dq),
+    .SRAM_ADDR		(sramd_addr),
+    .SRAM_LB_N		(sram_lb_n),
+    .SRAM_UB_N		(sram_ub_n),
+    .SRAM_CE_N		(sram_ce_n),
+    .SRAM_OE_N		(sram_oe_n),
+    .SRAM_WE_N		(sram_we_n)
+);
+`else
 minsoc_onchip_ram_top # 
 (
     .adr_width(`MEMORY_ADR_WIDTH)     //16 blocks of 2048 bytes memory 32768
@@ -756,6 +812,7 @@ onchip_ram_top (
 	.wb_ack_o	( wb_ss_ack_o ),
 	.wb_err_o	( wb_ss_err_o )
 );
+`endif
 `endif
 `endif
 
@@ -995,6 +1052,17 @@ minsoc_tc_top #(`APP_ADDR_DEC_W,
 	.t0_wb_ack_i	( wb_sds_ack_o ),
 	.t0_wb_err_i	( wb_sds_err_o ),
 `else
+`ifdef SRAM
+	.t0_wb_cyc_o	( wb_ess_cyc_i ),
+	.t0_wb_stb_o	( wb_ess_stb_i ),
+	.t0_wb_adr_o	( wb_ess_adr_i ),
+	.t0_wb_sel_o	( wb_ess_sel_i ),
+	.t0_wb_we_o	( wb_ess_we_i  ),
+	.t0_wb_dat_o	( wb_ess_dat_i ),
+	.t0_wb_dat_i	( wb_ess_dat_o ),
+	.t0_wb_ack_i	( wb_ess_ack_o ),
+	.t0_wb_err_i	( wb_ess_err_o ),
+`else
 	.t0_wb_cyc_o	( wb_ss_cyc_i ),
 	.t0_wb_stb_o	( wb_ss_stb_i ),
 	.t0_wb_adr_o	( wb_ss_adr_i ),
@@ -1004,6 +1072,7 @@ minsoc_tc_top #(`APP_ADDR_DEC_W,
 	.t0_wb_dat_i	( wb_ss_dat_o ),
 	.t0_wb_ack_i	( wb_ss_ack_o ),
 	.t0_wb_err_i	( wb_ss_err_o ),
+`endif
 `endif
 
 	// WISHBONE Target 1
